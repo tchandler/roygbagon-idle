@@ -34,6 +34,7 @@ const state = {
   }
 }
 
+// Helper functions
 const getMs = () => Date.now()
 
 const prorate = (value, timeDelta, period) => value * (timeDelta / period)
@@ -57,6 +58,7 @@ const calculateShipValue = (state) => {
   return Math.max(baseAward - (errorPct * baseAward), 0)
 }
 
+// Main loop
 const tick = (state) => {
     const now = getMs()
     state.timeDelta = now - state.lastFrame
@@ -68,10 +70,12 @@ const tick = (state) => {
     })
 }
 
+// Time based updates
 const update = (state) => {
   state.score += prorateSeconds(config.scoreIncrement + calculateInterest(state), state.timeDelta)
 }
 
+// Render updates to interface
 const render = (state) => {
   const currentColor = calculateColorHex(state.colors)
   const targetColor = calculateColorHex(state.targetColor)
@@ -95,6 +99,8 @@ const render = (state) => {
   `
 }
 
+
+// Setup click handlers
 const init = (state) => {
   state.lastFrame = getMs()
   moreButton.addEventListener('click', () => {
@@ -140,9 +146,8 @@ const init = (state) => {
   tick(state)
 }
 
-const initOnClick = () => {
+// Start to init
+startButton.addEventListener('click', function initOnClick() {
   startButton.removeEventListener('click', initOnClick)
   init(state)
-}
-
-startButton.addEventListener('click', initOnClick)
+})
