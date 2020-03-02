@@ -1,0 +1,10 @@
+{
+  "name": "roygbagon",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Tom Chandler <zohogorganzola@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "parcel-bundler": "^1.12.4"
+  }
+}
