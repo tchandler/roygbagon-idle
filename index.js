@@ -6,14 +6,16 @@ const buyRedButton = document.getElementById("buyRed");
 const buyGreenButton = document.getElementById("buyGreen");
 const buyBlueButton = document.getElementById("buyBlue");
 const shipButton = document.getElementById("shipIt");
+const dumpButton = document.getElementById("dumpIt");
 
 const config = {
   scoreIncrement: 10,
-  investmentIncrement: 1,
-  investmentCost: 100,
+  investmentIncrement: 10,
+  investmentCost: 1000,
   colorCost: 50,
   colorIncrement: 1,
-  shipAwardMultiplyer: 1.1
+  shipAwardMultiplyer: 1.1,
+  dumpMultiplyer: 1.1
 };
 
 const state = {
@@ -46,22 +48,34 @@ const calculateInterest = state =>
   config.scoreIncrement * (state.investment / 1000);
 
 const calculateColorHex = ({ red, green, blue }) => {
-  const total = red + green + blue;
+  const total = calculateColorWeight({ red, green, blue });
   const redHex = "0" + Math.floor((red / total) * 255).toString(16);
   const greenHex = "0" + Math.floor((green / total) * 255).toString(16);
   const blueHex = "0" + Math.floor((blue / total) * 255).toString(16);
   return `${redHex.substr(-2)}${greenHex.substr(-2)}${blueHex.substr(-2)}`;
 };
 
+const calculateColorWeight = ({ red, green, blue }) => red + green + blue;
+
 const calculateShipValue = state => {
   const currColor = parseInt(calculateColorHex(state.colors), 16);
   const targetColor = parseInt(calculateColorHex(state.targetColor), 16);
-  const errorPct = Math.abs(currColor - targetColor) / 0xffffff;
+  const colorErrorPct = Math.abs(currColor - targetColor) / 0xffffff;
+
+  const currWeight = calculateColorWeight(state.colors);
+  const targetWeight = calculateColorWeight(state.targetColor);
+
+  const weightError = targetWeight - currWeight;
+
   const baseAward =
-    (state.targetColor.red + state.targetColor.green + state.targetColor.blue) *
+    (targetWeight - Math.abs(weightError)) *
     config.colorCost *
     config.shipAwardMultiplyer;
-  return [Math.max(baseAward - errorPct * baseAward, 0), errorPct];
+  return [
+    Math.max(baseAward - colorErrorPct * baseAward, 0),
+    colorErrorPct,
+    weightError
+  ];
 };
 
 // Main loop
@@ -119,7 +133,7 @@ const render = state => {
 const renderShipped = state =>
   state.shipped
     .map(
-      ({ shippedColor, targetColor, shipValue, error }) => `<li>
+      ({ shippedColor, targetColor, shipValue, error, weightDiff }) => `<li>
     Shipped Color: <span class="swatch" style="background-color: #${calculateColorHex(
       shippedColor
     )};"></span><br />
@@ -127,7 +141,8 @@ const renderShipped = state =>
       targetColor
     )};"></span><br />
     Earned: ${shipValue}<br />
-    Error: ${(error * 100).toPrecision(2)}%
+    Error: ${(error * 100).toPrecision(2)}%<br />
+    Weight diff: ${weightDiff}
   </li>`
     )
     .join("");
@@ -163,26 +178,37 @@ const init = state => {
     }
   });
   shipButton.addEventListener("click", () => {
-    const [shipValue, errorPct] = calculateShipValue(state);
-    console.log("earned", shipValue);
-    state.score += shipValue;
-    state.shipped.unshift({
-      shippedColor: state.colors,
-      targetColor: state.targetColor,
-      shipValue: shipValue,
-      error: errorPct
-    });
-    state.colors = {
-      red: 0,
-      green: 0,
-      blue: 0
-    };
-    state.targetColor = {
-      red: Math.floor(Math.random() * 10),
-      green: Math.floor(Math.random() * 10),
-      blue: Math.floor(Math.random() * 10)
-    };
+    const [shipValue, errorPct, weightError] = calculateShipValue(state);
+    if (shipValue > 0) {
+      state.score += shipValue;
+      state.shipped.unshift({
+        shippedColor: state.colors,
+        targetColor: state.targetColor,
+        shipValue: shipValue,
+        error: errorPct,
+        weightDiff: weightError
+      });
+      state.colors = {
+        red: 0,
+        green: 0,
+        blue: 0
+      };
+      state.targetColor = {
+        red: Math.floor(Math.random() * 10),
+        green: Math.floor(Math.random() * 10),
+        blue: Math.floor(Math.random() * 10)
+      };
+    }
   });
+  dumpButton.addEventListener('click', () => {
+    const currWeight = calculateColorWeight(state.colors)
+    const dumpCost = currWeight * config.dumpMultiplyer
+    if (state.score >= dumpCost) {
+      state.score -= dumpCost
+      state.colors = { red: 0, green: 0, blue: 0 }
+    }
+  })
+
   tick(state);
 };
 

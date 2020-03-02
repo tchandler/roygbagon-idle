@@ -1,6 +1,3 @@
-* gh-pages build
-* Show most recent ship amount
-* Balance shipment error percent
 * More granular rendering (don't re-render the whole thing every time)
   * Might consider a framework, probably something lighter than react
 * Purchasable items
