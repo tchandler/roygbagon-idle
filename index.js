@@ -1,11 +1,11 @@
-const elem = document.getElementById('roygbagon')
-const startButton = document.getElementById('start')
-const moreButton = document.getElementById('more')
-const investButton = document.getElementById('invest')
-const buyRedButton = document.getElementById('buyRed')
-const buyGreenButton = document.getElementById('buyGreen')
-const buyBlueButton = document.getElementById('buyBlue')
-const shipButton = document.getElementById('shipIt')
+const elem = document.getElementById("roygbagon");
+const startButton = document.getElementById("start");
+const moreButton = document.getElementById("more");
+const investButton = document.getElementById("invest");
+const buyRedButton = document.getElementById("buyRed");
+const buyGreenButton = document.getElementById("buyGreen");
+const buyBlueButton = document.getElementById("buyBlue");
+const shipButton = document.getElementById("shipIt");
 
 const config = {
   scoreIncrement: 10,
@@ -13,8 +13,8 @@ const config = {
   investmentCost: 100,
   colorCost: 50,
   colorIncrement: 1,
-  shipAwardMultiplyer: 1.10
-}
+  shipAwardMultiplyer: 1.1
+};
 
 const state = {
   score: 0,
@@ -31,58 +31,69 @@ const state = {
     red: 2,
     green: 3,
     blue: 6
-  }
-}
+  },
+  shipped: []
+};
 
 // Helper functions
-const getMs = () => Date.now()
+const getMs = () => Date.now();
 
-const prorate = (value, timeDelta, period) => value * (timeDelta / period)
-const prorateSeconds = (value, timeDelta) => prorate(value, timeDelta, 1000)
-const prorateInterest = (state) => prorateSeconds(calculateInterest(state), state.timeDelta)
-const calculateInterest = (state) => config.scoreIncrement * (state.investment/1000)
+const prorate = (value, timeDelta, period) => value * (timeDelta / period);
+const prorateSeconds = (value, timeDelta) => prorate(value, timeDelta, 1000);
+const prorateInterest = state =>
+  prorateSeconds(calculateInterest(state), state.timeDelta);
+const calculateInterest = state =>
+  config.scoreIncrement * (state.investment / 1000);
 
-const calculateColorHex = ({red, green, blue}) => {
-  const total = red + green + blue
-  const redHex = '0' + Math.floor((red / total) * 255).toString(16)
-  const greenHex = '0' + Math.floor((green / total) * 255).toString(16)
-  const blueHex = '0' + Math.floor((blue / total) * 255).toString(16)
-  return `${redHex.substr(-2)}${greenHex.substr(-2)}${blueHex.substr(-2)}`
-}
+const calculateColorHex = ({ red, green, blue }) => {
+  const total = red + green + blue;
+  const redHex = "0" + Math.floor((red / total) * 255).toString(16);
+  const greenHex = "0" + Math.floor((green / total) * 255).toString(16);
+  const blueHex = "0" + Math.floor((blue / total) * 255).toString(16);
+  return `${redHex.substr(-2)}${greenHex.substr(-2)}${blueHex.substr(-2)}`;
+};
 
-const calculateShipValue = (state) => {
-  const currColor = parseInt(calculateColorHex(state.colors), 16)
-  const targetColor = parseInt(calculateColorHex(state.targetColor), 16)
-  const errorPct = Math.abs(currColor - targetColor)/0xFFFFFF
-  const baseAward = (state.targetColor.red + state.targetColor.green + state.targetColor.blue) * config.colorCost * config.shipAwardMultiplyer
-  return Math.max(baseAward - (errorPct * baseAward), 0)
-}
+const calculateShipValue = state => {
+  const currColor = parseInt(calculateColorHex(state.colors), 16);
+  const targetColor = parseInt(calculateColorHex(state.targetColor), 16);
+  const errorPct = Math.abs(currColor - targetColor) / 0xffffff;
+  const baseAward =
+    (state.targetColor.red + state.targetColor.green + state.targetColor.blue) *
+    config.colorCost *
+    config.shipAwardMultiplyer;
+  return [Math.max(baseAward - errorPct * baseAward, 0), errorPct];
+};
 
 // Main loop
-const tick = (state) => {
-    const now = getMs()
-    state.timeDelta = now - state.lastFrame
-    state.lastFrame = now
-    update(state)
-    render(state)
-    window.requestAnimationFrame(() => {
-      tick(state)
-    })
-}
+const tick = state => {
+  const now = getMs();
+  state.timeDelta = now - state.lastFrame;
+  state.lastFrame = now;
+  update(state);
+  render(state);
+  window.requestAnimationFrame(() => {
+    tick(state);
+  });
+};
 
 // Time based updates
-const update = (state) => {
-  state.score += prorateSeconds(config.scoreIncrement + calculateInterest(state), state.timeDelta)
-}
+const update = state => {
+  state.score += prorateSeconds(
+    config.scoreIncrement + calculateInterest(state),
+    state.timeDelta
+  );
+};
 
 // Render updates to interface
-const render = (state) => {
-  const currentColor = calculateColorHex(state.colors)
-  const targetColor = calculateColorHex(state.targetColor)
+const render = state => {
+  const currentColor = calculateColorHex(state.colors);
+  const targetColor = calculateColorHex(state.targetColor);
   elem.innerHTML = `
     <p>Your current score is ${Math.floor(state.score)}</p>
     <p>You've invested ${state.investment} times</p>
-    <p>Your investment multiplier is ${(state.investment).toPrecision(2)}% (${calculateInterest(state)} per second)</p>
+    <p>Your investment multiplier is ${state.investment.toPrecision(
+      2
+    )}% (${calculateInterest(state)} per second)</p>
     <p>
       <h3>Colors:</h3>
       <ul>
@@ -96,58 +107,87 @@ const render = (state) => {
       <h3>Target Color:</h3>
       <span class="swatch" style="background-color: #${targetColor};"></span>
     </p>
-  `
-}
+    <p>
+      <h3>Shipped: </h3>
+      <ul>
+        ${renderShipped(state)}
+      </ul>
+    </p>
+  `;
+};
 
+const renderShipped = state =>
+  state.shipped
+    .map(
+      ({ shippedColor, targetColor, shipValue, error }) => `<li>
+    Shipped Color: <span class="swatch" style="background-color: #${calculateColorHex(
+      shippedColor
+    )};"></span><br />
+    Target Color: <span class="swatch" style="background-color: #${calculateColorHex(
+      targetColor
+    )};"></span><br />
+    Earned: ${shipValue}<br />
+    Error: ${(error * 100).toPrecision(2)}%
+  </li>`
+    )
+    .join("");
 
 // Setup click handlers
-const init = (state) => {
-  state.lastFrame = getMs()
-  moreButton.addEventListener('click', () => {
-    state.score += config.scoreIncrement
-  })
-  investButton.addEventListener('click', () => {
+const init = state => {
+  state.lastFrame = getMs();
+  moreButton.addEventListener("click", () => {
+    state.score += config.scoreIncrement;
+  });
+  investButton.addEventListener("click", () => {
     if (state.score >= config.investmentCost) {
-      state.score -= config.investmentCost
-      state.investment += config.investmentIncrement
+      state.score -= config.investmentCost;
+      state.investment += config.investmentIncrement;
     }
-  })
-  buyRedButton.addEventListener('click', () => {
+  });
+  buyRedButton.addEventListener("click", () => {
     if (state.score >= config.colorCost) {
-      state.score -= config.colorCost
-      state.colors.red += config.colorIncrement
+      state.score -= config.colorCost;
+      state.colors.red += config.colorIncrement;
     }
-  })
-  buyGreenButton.addEventListener('click', () => {
+  });
+  buyGreenButton.addEventListener("click", () => {
     if (state.score >= config.colorCost) {
-      state.score -= config.colorCost
-      state.colors.green += config.colorIncrement
+      state.score -= config.colorCost;
+      state.colors.green += config.colorIncrement;
     }
-  })
-  buyBlueButton.addEventListener('click', () => {
+  });
+  buyBlueButton.addEventListener("click", () => {
     if (state.score >= config.colorCost) {
-      state.score -= config.colorCost
-      state.colors.blue += config.colorIncrement
+      state.score -= config.colorCost;
+      state.colors.blue += config.colorIncrement;
     }
-  })
-  shipButton.addEventListener('click', () => {
-    const shipValue = calculateShipValue(state)
-    console.log('earned', shipValue)
-    state.score += shipValue
+  });
+  shipButton.addEventListener("click", () => {
+    const [shipValue, errorPct] = calculateShipValue(state);
+    console.log("earned", shipValue);
+    state.score += shipValue;
+    state.shipped.unshift({
+      shippedColor: state.colors,
+      targetColor: state.targetColor,
+      shipValue: shipValue,
+      error: errorPct
+    });
     state.colors = {
-      red: 0, green: 0, blue: 0
-    }
+      red: 0,
+      green: 0,
+      blue: 0
+    };
     state.targetColor = {
       red: Math.floor(Math.random() * 10),
       green: Math.floor(Math.random() * 10),
       blue: Math.floor(Math.random() * 10)
-    }
-  })
-  tick(state)
-}
+    };
+  });
+  tick(state);
+};
 
 // Start to init
-startButton.addEventListener('click', function initOnClick() {
-  startButton.removeEventListener('click', initOnClick)
-  init(state)
-})
+startButton.addEventListener("click", function initOnClick() {
+  startButton.removeEventListener("click", initOnClick);
+  init(state);
+});
