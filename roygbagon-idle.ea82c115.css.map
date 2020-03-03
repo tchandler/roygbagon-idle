@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,OACE,aAAc,CACd,WACF,CAEA,QACE,UAAW,CACX,WAAY,CACZ,oBAAqB,CACrB,qBACF","file":"roygbagon-idle.ea82c115.css","sourceRoot":"..","sourcesContent":["button {\n  padding: 1.5em;\n  margin: 0.3em;\n}\n\n.swatch {\n  width: 40px;\n  height: 40px;\n  display: inline-block;\n  border: 1px solid black;\n}"]}

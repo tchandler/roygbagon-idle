@@ -1,1 +1,0 @@
-{"version":3,"sources":["index.css"],"names":[],"mappings":"AAAA,QACE,UAAW,CACX,WAAY,CACZ,oBAAqB,CACrB,qBACF","file":"roygbagon-idle.1dec7d83.css","sourceRoot":"..","sourcesContent":[".swatch {\n  width: 40px;\n  height: 40px;\n  display: inline-block;\n  border: 1px solid black;\n}"]}
