@@ -15,19 +15,27 @@ const config = {
   colorCost: 50,
   colorIncrement: 1,
   shipAwardMultiplyer: 1.1,
-  dumpMultiplyer: 1.1
+  dumpMultiplyer: 1.1,
+  accuracyMods: [
+    [1, 0.25],
+    [0.5, 0.5],
+    [0.25, 0.8],
+    [0.1, 1],
+    [0.05, 1.5],
+    [0.01, 1.75]
+  ]
 };
 
 const state = {
-  score: 0,
+  score: 400,
   investment: 0,
   ticks: 0,
   lastFrame: 0,
   timeDelta: 0,
   colors: {
-    red: 0,
-    green: 0,
-    blue: 0
+    red: 2,
+    green: 3,
+    blue: 6
   },
   targetColor: {
     red: 2,
@@ -39,16 +47,21 @@ const state = {
 
 // Helper functions
 const getMs = () => Date.now();
-
+const getRGB = color => [color >> 16, (color >> 8) & 0xff, color & 0xff];
 const prorate = (value, timeDelta, period) => value * (timeDelta / period);
 const prorateSeconds = (value, timeDelta) => prorate(value, timeDelta, 1000);
 const prorateInterest = state =>
   prorateSeconds(calculateInterest(state), state.timeDelta);
 const calculateInterest = state =>
-  config.scoreIncrement * (state.investment / 1000);
+  config.scoreIncrement *
+  ((state.investment * config.investmentIncrement) / 1000);
 
 const calculateColorHex = ({ red, green, blue }) => {
-  const total = calculateColorWeight({ red, green, blue });
+  const total = calculateColorWeight({
+    red,
+    green,
+    blue
+  });
   const redHex = "0" + Math.floor((red / total) * 255).toString(16);
   const greenHex = "0" + Math.floor((green / total) * 255).toString(16);
   const blueHex = "0" + Math.floor((blue / total) * 255).toString(16);
@@ -56,21 +69,42 @@ const calculateColorHex = ({ red, green, blue }) => {
 };
 
 const calculateColorWeight = ({ red, green, blue }) => red + green + blue;
+const calculateColorDistance = ([x1, y1, z1], [x2, y2, z2]) =>
+  (
+    Math.pow((x2 - x1), 2) + 
+    Math.pow((y2 - y1), 2) + 
+    Math.pow((z2 - z1), 2)
+  ) ^ (1 / 2);
 
 const calculateShipValue = state => {
-  const currColor = parseInt(calculateColorHex(state.colors), 16);
-  const targetColor = parseInt(calculateColorHex(state.targetColor), 16);
-  const colorErrorPct = Math.abs(currColor - targetColor) / 0xffffff;
+  const currColorHex = calculateColorHex(state.colors);
+  const currColor = parseInt(currColorHex, 16);
+  const targetColorHex = calculateColorHex(state.targetColor);
+  const targetColor = parseInt(targetColorHex, 16);
+
+  const colorDistance = calculateColorDistance(
+    getRGB(currColor),
+    getRGB(targetColor)
+  );
+
+  const colorErrorPct = colorDistance / 195075;
+  
+  console.log(`Color Distance: ${colorDistance}`, `Color Error: ${colorErrorPct}`)
 
   const currWeight = calculateColorWeight(state.colors);
   const targetWeight = calculateColorWeight(state.targetColor);
 
   const weightError = targetWeight - currWeight;
 
+  const accuracyMod = config.accuracyMods.reduce((currMod, [max, mod]) => {
+    return colorErrorPct <= max ? mod : currMod;
+  }, 0);
+
   const baseAward =
     (targetWeight - Math.abs(weightError)) *
     config.colorCost *
-    config.shipAwardMultiplyer;
+    config.shipAwardMultiplyer *
+    accuracyMod;
   return [
     Math.max(baseAward - colorErrorPct * baseAward, 0),
     colorErrorPct,
@@ -156,7 +190,7 @@ const init = state => {
   investButton.addEventListener("click", () => {
     if (state.score >= config.investmentCost) {
       state.score -= config.investmentCost;
-      state.investment += config.investmentIncrement;
+      state.investment += 1;
     }
   });
   buyRedButton.addEventListener("click", () => {
@@ -200,14 +234,18 @@ const init = state => {
       };
     }
   });
-  dumpButton.addEventListener('click', () => {
-    const currWeight = calculateColorWeight(state.colors)
-    const dumpCost = currWeight * config.dumpMultiplyer
+  dumpButton.addEventListener("click", () => {
+    const currWeight = calculateColorWeight(state.colors);
+    const dumpCost = currWeight * config.dumpMultiplyer;
     if (state.score >= dumpCost) {
-      state.score -= dumpCost
-      state.colors = { red: 0, green: 0, blue: 0 }
+      state.score -= dumpCost;
+      state.colors = {
+        red: 0,
+        green: 0,
+        blue: 0
+      };
     }
-  })
+  });
 
   tick(state);
 };
