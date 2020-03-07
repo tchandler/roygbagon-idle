@@ -1,5 +1,6 @@
-import { takeEvery, all, put, select } from "redux-saga/effects";
-import { Types as GameTypes, Creators } from "r/Redux/game";
+import { takeEvery, all, put, select, takeLatest } from "redux-saga/effects";
+import { Creators as GameActions } from "r/Redux/Game/actions";
+const { updateScore, updateColor } = GameActions;
 // import DebugConfig from '../Config/DebugConfig'
 
 /* ------------- Sagas ------------- */
@@ -14,10 +15,8 @@ function* buyRed() {
 
   if (currentScore >= colorCost) {
     const currentColors = yield select(({ game }) => game.colors);
-    yield put(Creators.updateScore(currentScore - colorCost));
-    yield put(
-      Creators.updateColor({ ...currentColors, red: currentColors.red + 1 })
-    );
+    yield put(updateScore(currentScore - colorCost));
+    yield put(updateColor({ ...currentColors, red: currentColors.red + 1 }));
   }
 }
 
@@ -27,9 +26,12 @@ function* buyGreen() {
 
   if (currentScore >= colorCost) {
     const currentColors = yield select(({ game }) => game.colors);
-    yield put(Creators.updateScore(currentScore - colorCost));
+    yield put(updateScore(currentScore - colorCost));
     yield put(
-      Creators.updateColor({ ...currentColors, green: currentColors.green + 1 })
+      updateColor({
+        ...currentColors,
+        green: currentColors.green + 1
+      })
     );
   }
 }
@@ -40,9 +42,12 @@ function* buyBlue() {
 
   if (currentScore >= colorCost) {
     const currentColors = yield select(({ game }) => game.colors);
-    yield put(Creators.updateScore(currentScore - colorCost));
+    yield put(updateScore(currentScore - colorCost));
     yield put(
-      Creators.updateColor({ ...currentColors, blue: currentColors.blue + 1 })
+      updateColor({
+        ...currentColors,
+        blue: currentColors.blue + 1
+      })
     );
   }
 }
@@ -60,7 +65,7 @@ function* incrementScore(timeDelta) {
   const currentScore = yield select(getScore);
   const interestRate = yield select(getInterestRate);
   const newScore = currentScore + (1 + currentScore * interestRate) * timeDelta;
-  yield put(Creators.updateScore(newScore));
+  yield put(updateScore(newScore));
 }
 
 const nextFrame = () =>
@@ -70,7 +75,7 @@ function* tickSaga() {
   let lastCall = Date.now();
   let thisCall = Date.now();
   let score = yield select(({ game }) => game.score);
-  while (score < 100) {
+  while (score < 100000) {
     yield nextFrame();
     thisCall = Date.now();
     let diff = thisCall - lastCall;

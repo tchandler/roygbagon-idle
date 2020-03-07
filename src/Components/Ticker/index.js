@@ -1,10 +1,12 @@
 import React from "react";
 import { connect } from "react-redux"
 
+import './index.css'
+
 class Ticker extends React.Component {
     render() {
-        return <div>
-            The Score Is {this.props.score}
+        return <div className="score">
+            {this.props.score}
         </div>
     }
 }

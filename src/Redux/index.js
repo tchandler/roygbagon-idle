@@ -1,8 +1,8 @@
-import { combineReducers } from 'redux';
-import configureStore from './CreateStore';
-import gameReducer from './game'
-import configReducer from './config'
-import rootSaga from 'r/Sagas/';
+import { combineReducers } from "redux";
+import configureStore from "./CreateStore";
+import { reducer as gameReducer } from "./Game";
+import { reducer as configReducer } from "./config";
+import rootSaga from "r/Sagas/";
 
 /* ------------- Assemble The Reducers ------------- */
 export const reducers = combineReducers({
@@ -20,10 +20,10 @@ export default () => {
 
   if (module.hot) {
     module.hot.accept(() => {
-      const nextRootReducer = require('./').reducers;
+      const nextRootReducer = require("./").reducers;
       store.replaceReducer(nextRootReducer);
 
-      const newYieldedSagas = require('../Sagas').default;
+      const newYieldedSagas = require("../Sagas").default;
       sagasManager.cancel();
       sagasManager.done.then(() => {
         sagasManager = sagaMiddleware.run(newYieldedSagas);

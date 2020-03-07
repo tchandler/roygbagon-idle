@@ -18,4 +18,4 @@ const DEFAULT_CONFIG = {
   ]
 }
 
-export default createReducer(DEFAULT_CONFIG, {})
+export const reducer = createReducer(DEFAULT_CONFIG, {})

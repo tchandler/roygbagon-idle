@@ -1,6 +1,8 @@
 import React from "react";
 import { connect } from "react-redux";
 
+import "./index.css";
+
 const calculateColorHex = (red, green, blue) => {
   const total = red + green + blue;
   const redHex = "0" + Math.floor((red / total) * 255).toString(16);
@@ -11,20 +13,16 @@ const calculateColorHex = (red, green, blue) => {
 
 export default ({ red, green, blue }) => (
   <div>
-    <div>
-      <h3>Colors:</h3>
-      <ul>
-        <li>Red: {red}</li>
-        <li>Green: {green}</li>
-        <li>Blue: {blue}</li>
-      </ul>
-    </div>
-    <div>
-      Current color:
-      <span
-        className="swatch"
-        style={{ backgroundColor: `#${calculateColorHex(red, green, blue)}` }}
-      ></span>
-    </div>
+    <ul>
+      <li>Red: {red}</li>
+      <li>Green: {green}</li>
+      <li>Blue: {blue}</li>
+      <li>
+        <span
+          className="swatch"
+          style={{ backgroundColor: `#${calculateColorHex(red, green, blue)}` }}
+        ></span>
+      </li>
+    </ul>
   </div>
 );
