@@ -10,7 +10,7 @@ class Ticker extends React.Component {
 }
 
 const mapStateToProps = (state) => ({
-  score: state.game.score
+  score: Math.floor(state.game.score)
 })
 
 export default connect(mapStateToProps)(Ticker)

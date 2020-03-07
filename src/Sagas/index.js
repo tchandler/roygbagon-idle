@@ -16,9 +16,17 @@ import { Creators } from 'r/Redux/game'
 // to the sagas which need it.
 // const api = DebugConfig.useFixtures ? FixtureAPI : API.create()
 
-function nextFrame() {
-  return new Promise(resolve => window.requestAnimationFrame(() => resolve()))
+const getScore = ({game}) => game.score
+const getInterestRate = () => 0.01
+
+function* incrementScore(timeDelta) {
+  const currentScore = yield select(getScore)
+  const interestRate = yield select(getInterestRate)
+  const newScore = currentScore + ((1 + (currentScore * interestRate)) * timeDelta)
+  yield put(Creators.updateScore(newScore))
 }
+
+const nextFrame = () => new Promise(resolve => window.requestAnimationFrame(() => resolve()))
 
 function* tickSaga () {
   let lastCall = Date.now()
@@ -30,8 +38,7 @@ function* tickSaga () {
     let diff = thisCall - lastCall
     
     score = yield select(({game}) => game.score)
-    
-    yield put(Creators.incrementScore(diff))
+    yield incrementScore(diff / 1000)
     
     lastCall = thisCall
   }
