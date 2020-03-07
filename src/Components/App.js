@@ -2,7 +2,8 @@ import React from "react";
 import Ticker from "./Ticker";
 import { connect } from "react-redux";
 import { Creators } from "../Redux/game";
-import ColorCard from "./ColorCard";
+import CurrentColorCard from "r/Containers/CurrentColorCard";
+import TargetColorCard from "r/Containers/TargetColorCard";
 
 class App extends React.Component {
   render() {
@@ -14,7 +15,8 @@ class App extends React.Component {
           <button onClick={this.props.incrementScore} name="incr">
             Incr
           </button>
-          <ColorCard />
+          <CurrentColorCard />
+          <TargetColorCard />
         </div>
       </div>
     );
