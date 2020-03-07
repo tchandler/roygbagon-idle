@@ -10,7 +10,7 @@ const dumpButton = document.getElementById("dumpIt");
 
 const config = {
   scoreIncrement: 10,
-  investmentIncrement: 10,
+  investmentIncrement: 0.001,
   investmentCost: 1000,
   colorCost: 50,
   colorIncrement: 1,
@@ -28,7 +28,7 @@ const config = {
 
 const state = {
   score: 400,
-  investment: 0,
+  investments: 0,
   ticks: 0,
   lastFrame: 0,
   timeDelta: 0,
@@ -54,7 +54,7 @@ const prorateInterest = state =>
   prorateSeconds(calculateInterest(state), state.timeDelta);
 const calculateInterest = state =>
   config.scoreIncrement *
-  ((state.investment * config.investmentIncrement) / 1000);
+  ((state.investments * config.investmentIncrement) / 1000);
 
 const calculateColorHex = ({ red, green, blue }) => {
   const total = calculateColorWeight({
@@ -138,8 +138,8 @@ const render = state => {
   const targetColor = calculateColorHex(state.targetColor);
   elem.innerHTML = `
     <p>Your current score is ${Math.floor(state.score)}</p>
-    <p>You've invested ${state.investment} times</p>
-    <p>Your investment multiplier is ${state.investment.toPrecision(
+    <p>You've invested ${state.investments} times</p>
+    <p>Your investment multiplier is ${state.investments.toPrecision(
       2
     )}% (${calculateInterest(state)} per second)</p>
     <p>
@@ -190,7 +190,7 @@ const init = state => {
   investButton.addEventListener("click", () => {
     if (state.score >= config.investmentCost) {
       state.score -= config.investmentCost;
-      state.investment += 1;
+      state.investments += 1;
     }
   });
   buyRedButton.addEventListener("click", () => {

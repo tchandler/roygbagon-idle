@@ -1,11 +1,13 @@
 import { combineReducers } from 'redux';
 import configureStore from './CreateStore';
 import gameReducer from './game'
+import configReducer from './config'
 import rootSaga from 'r/Sagas/';
 
 /* ------------- Assemble The Reducers ------------- */
 export const reducers = combineReducers({
-  game: gameReducer
+  game: gameReducer,
+  config: configReducer
 });
 
 export default () => {
