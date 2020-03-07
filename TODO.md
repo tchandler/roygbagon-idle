@@ -7,7 +7,13 @@ UX:
   - [ ] Score Modifiers Box
 Tech:
   - [ ] More granular rendering (don't re-render the whole thing every time)
-    - [ ] Might consider a framework, probably something lighter than react
+    - [ X ] React
+    - [ ] Port config/state to appropriate stores
+    - [ ] Make Components
+      - [ ] Controls
+      - [ ] Color Card
+      - [ ] Score Card
+      - [ ] Shipped Color
   - [ ] Dev ui with sliders/inputs to change balances/restart game
 Game:
   - [ ] Dynamic pricing?
