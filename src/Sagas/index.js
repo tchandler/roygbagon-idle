@@ -1,6 +1,9 @@
-import { takeEvery, all, put, select, takeLatest } from "redux-saga/effects";
-import { Creators as GameActions } from "r/Redux/Game/actions";
-const { updateScore, updateColor } = GameActions;
+import { takeEvery, all, put, select, fork } from "redux-saga/effects";
+import {
+  Creators as GameActions,
+  Types as GameTypes
+} from "r/Redux/Game/actions";
+const { updateScore, updateColors } = GameActions;
 // import DebugConfig from '../Config/DebugConfig'
 
 /* ------------- Sagas ------------- */
@@ -16,7 +19,7 @@ function* buyRed() {
   if (currentScore >= colorCost) {
     const currentColors = yield select(({ game }) => game.colors);
     yield put(updateScore(currentScore - colorCost));
-    yield put(updateColor({ ...currentColors, red: currentColors.red + 1 }));
+    yield put(updateColors({ ...currentColors, red: currentColors.red + 1 }));
   }
 }
 
@@ -28,7 +31,7 @@ function* buyGreen() {
     const currentColors = yield select(({ game }) => game.colors);
     yield put(updateScore(currentScore - colorCost));
     yield put(
-      updateColor({
+      updateColors({
         ...currentColors,
         green: currentColors.green + 1
       })
@@ -44,7 +47,7 @@ function* buyBlue() {
     const currentColors = yield select(({ game }) => game.colors);
     yield put(updateScore(currentScore - colorCost));
     yield put(
-      updateColor({
+      updateColors({
         ...currentColors,
         blue: currentColors.blue + 1
       })
@@ -91,9 +94,9 @@ function* tickSaga() {
 
 export default function* root() {
   yield all([
-    tickSaga(),
-    takeEvery("BUY_RED", buyRed),
-    takeEvery("BUY_GREEN", buyGreen),
-    takeEvery("BUY_BLUE", buyBlue)
+    fork(tickSaga),
+    takeEvery(GameTypes.BUY_RED, buyRed),
+    takeEvery(GameTypes.BUY_GREEN, buyGreen),
+    takeEvery(GameTypes.BUY_BLUE, buyBlue)
   ]);
 }

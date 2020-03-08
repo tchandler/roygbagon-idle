@@ -1,5 +1,5 @@
 import { Types } from "./actions";
-import { incrementScore, updateScore } from "./reducers";
+import { incrementScore, updateScore, updateColors } from "./reducers";
 import { createReducer } from "reduxsauce";
 
 const INITIAL_STATE = {
@@ -23,7 +23,8 @@ const INITIAL_STATE = {
 
 export const handlers = {
   [Types.INCREMENT_SCORE]: incrementScore,
-  [Types.UPDATE_SCORE]: updateScore
+  [Types.UPDATE_SCORE]: updateScore,
+  [Types.UPDATE_COLORS]: updateColors
 };
 
 export const reducer = createReducer(INITIAL_STATE, handlers);

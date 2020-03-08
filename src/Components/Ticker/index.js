@@ -1,18 +1,12 @@
 import React from "react";
-import { connect } from "react-redux"
+import { connect } from "react-redux";
 
-import './index.css'
+import "./index.css";
 
-class Ticker extends React.Component {
-    render() {
-        return <div className="score">
-            {this.props.score}
-        </div>
-    }
-}
+const Ticker = ({ score }) => <div className="score">{score}</div>;
 
-const mapStateToProps = (state) => ({
-  score: Math.floor(state.game.score)
-})
+const mapStateToProps = state => ({
+  score: state.game.score.toFixed(2)
+});
 
-export default connect(mapStateToProps)(Ticker)
+export default connect(mapStateToProps)(Ticker);
