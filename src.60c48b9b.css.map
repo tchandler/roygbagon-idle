@@ -1,0 +1,1 @@
+{"version":3,"sources":["index.css","Main.css"],"names":[],"mappings":"AAAA,OACI,eAAgB,CAChB,eAAgB,CAChB,iBACJ,CAHA,QACI,UAAW,CACX,WAAY,CACZ,oBAAqB,CACrB,qBACJ,CCNA,SACE,YACF","file":"src.60c48b9b.css","sourceRoot":"..","sourcesContent":[".score {\n    font-weight: 700;\n    font-size: large;\n    text-align: center;\n}",".buttons {\n  display: flex;\n}"]}
