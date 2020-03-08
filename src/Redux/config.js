@@ -1,9 +1,9 @@
-import { createReducer } from 'reduxsauce'
+import { createReducer } from "reduxsauce";
 
 const DEFAULT_CONFIG = {
   scoreIncrement: 10,
-  investmentIncrement: 10,
-  investmentCost: 1000,
+  investmentIncrement: 0.005,
+  investmentCost: 250,
   colorCost: 50,
   colorIncrement: 1,
   shipAwardMultiplyer: 1.1,
@@ -16,6 +16,6 @@ const DEFAULT_CONFIG = {
     [0.05, 1.5],
     [0.01, 1.75]
   ]
-}
+};
 
-export const reducer = createReducer(DEFAULT_CONFIG, {})
+export const reducer = createReducer(DEFAULT_CONFIG, {});

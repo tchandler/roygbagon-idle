@@ -70,11 +70,8 @@ const calculateColorHex = ({ red, green, blue }) => {
 
 const calculateColorWeight = ({ red, green, blue }) => red + green + blue;
 const calculateColorDistance = ([x1, y1, z1], [x2, y2, z2]) =>
-  (
-    Math.pow((x2 - x1), 2) + 
-    Math.pow((y2 - y1), 2) + 
-    Math.pow((z2 - z1), 2)
-  ) ^ (1 / 2);
+  (Math.pow(x2 - x1, 2) + Math.pow(y2 - y1, 2) + Math.pow(z2 - z1, 2)) ^
+  (1 / 2);
 
 const calculateShipValue = state => {
   const currColorHex = calculateColorHex(state.colors);
@@ -88,8 +85,6 @@ const calculateShipValue = state => {
   );
 
   const colorErrorPct = colorDistance / 195075;
-  
-  console.log(`Color Distance: ${colorDistance}`, `Color Error: ${colorErrorPct}`)
 
   const currWeight = calculateColorWeight(state.colors);
   const targetWeight = calculateColorWeight(state.targetColor);

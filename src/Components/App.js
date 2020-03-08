@@ -1,7 +1,6 @@
 import React from "react";
 import Ticker from "./Ticker";
 import { connect } from "react-redux";
-import { incrementScore } from "../Redux/Game/actions";
 import MainView from "r/Containers/Main";
 
 class App extends React.Component {
@@ -17,4 +16,4 @@ class App extends React.Component {
   }
 }
 
-export default connect(null, { incrementScore })(App);
+export default connect()(App);

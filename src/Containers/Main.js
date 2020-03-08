@@ -6,21 +6,22 @@ import TargetColorCard from "./TargetColorCard";
 import GenerateScore from "../Components/GenerateScore";
 import PurchasePalette from "../Components/PurchasePalette";
 import ShipColor from "../Components/ShipColor";
+import ShippedColorLog from "../Components/ShippedColorLog";
+import Invest from "../Components/Invest";
 import "./Main.css";
 
-const MainView = ({ incrementScore }) => {
+const MainView = () => {
   return (
     <div className="playArea">
       <div className="buttons">
         <GenerateScore />
-        <button id="invest" name="invest">
-          Invest
-        </button>
+        <Invest />
         <PurchasePalette />
         <ShipColor />
       </div>
       <CurrentColorCard />
       <TargetColorCard />
+      <ShippedColorLog />
     </div>
   );
 };

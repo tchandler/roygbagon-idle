@@ -3,20 +3,27 @@ import { connect } from "react-redux";
 
 import { Creators as GameActions } from "../Redux/Game/actions";
 
-const PurchasePalette = ({ canAfford, buyRed, buyGreen, buyBlue }) => [
+const PurchasePalette = ({
+  canAfford,
+  buyRed,
+  buyGreen,
+  buyBlue,
+  colorCost
+}) => [
   <button onClick={buyRed} disabled={!canAfford} key="buyRed">
-    Buy Red
+    Red ({colorCost})
   </button>,
   <button onClick={buyGreen} disabled={!canAfford} key="buyGreen">
-    Buy Green
+    Green ({colorCost})
   </button>,
   <button onClick={buyBlue} disabled={!canAfford} key="buyBlue">
-    Buy Blue
+    Blue ({colorCost})
   </button>
 ];
 
 const mapStateToProps = ({ game, config }) => ({
-  canAfford: game.score >= config.colorCost
+  canAfford: game.score >= config.colorCost,
+  colorCost: config.colorCost
 });
 
 const mapDispatchToProps = {

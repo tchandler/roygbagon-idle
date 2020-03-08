@@ -1,16 +1,17 @@
 import { Types } from "./actions";
 import {
-  incrementScore,
   updateScore,
+  updateTargetColor,
   updateColors,
   clearColor,
-  addShippedColor
+  addShippedColor,
+  updateInvestment
 } from "./reducers";
 import { createReducer } from "reduxsauce";
 
 const INITIAL_STATE = {
-  score: 400,
-  investments: 0,
+  score: 900,
+  investment: 0,
   ticks: 0,
   lastFrame: 0,
   timeDelta: 0,
@@ -28,11 +29,12 @@ const INITIAL_STATE = {
 };
 
 export const handlers = {
-  [Types.INCREMENT_SCORE]: incrementScore,
   [Types.UPDATE_SCORE]: updateScore,
   [Types.UPDATE_COLORS]: updateColors,
+  [Types.UPDATE_TARGET_COLOR]: updateTargetColor,
   [Types.CLEAR_COLOR]: clearColor,
-  [Types.ADD_SHIPPED_COLOR]: addShippedColor
+  [Types.ADD_SHIPPED_COLOR]: addShippedColor,
+  [Types.UPDATE_INVESTMENT]: updateInvestment
 };
 
 export const reducer = createReducer(INITIAL_STATE, handlers);

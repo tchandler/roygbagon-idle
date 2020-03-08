@@ -9,7 +9,14 @@ import {
   getRGB,
   calculateColorWeight
 } from "../Utils/color";
-const { updateScore, updateColors, clearColor, addShippedColor } = GameActions;
+const {
+  updateScore,
+  updateColors,
+  clearColor,
+  addShippedColor,
+  updateInvestment,
+  updateTargetColor
+} = GameActions;
 // import DebugConfig from '../Config/DebugConfig'
 
 /* ------------- Sagas ------------- */
@@ -17,24 +24,36 @@ const { updateScore, updateColors, clearColor, addShippedColor } = GameActions;
 // import { checkAuth, login, reminder } from './LoginSagas';
 
 const getScore = ({ game }) => game.score;
+const getInvestment = ({ game }) => game.investment;
 const getInterestRate = ({ game, config }) =>
-  game.investments * config.investmentIncrement;
+  game.investment * config.investmentIncrement;
 
 const getConfig = ({ config }) => config;
+const getGameState = ({ game }) => game;
 const getColors = ({ game }) => ({
   currentColor: game.colors,
   targetColor: game.targetColor
 });
 
+function* incrementScore() {
+  const score = yield select(getScore);
+  const { scoreIncrement } = yield select(getConfig);
+  yield put(updateScore(score + scoreIncrement));
+}
+
+function* buyInvestment() {
+  const { investmentCost } = yield select(getConfig);
+  const { score, investment } = yield select(getGameState);
+  yield put(updateScore(score - investmentCost));
+  yield put(updateInvestment(investment + 1));
+}
+
 function* shipColor() {
-  console.log("shipping color");
   const { accuracyMods, colorCost, shipAwardMultiplyer } = yield select(
     getConfig
   );
   const { currentColor, targetColor } = yield select(getColors);
   const currentScore = yield select(getScore);
-  const currentColorHex = calculateColorHex(currentColor);
-  const targetColorHex = calculateColorHex(targetColor);
 
   const colorDistance = calculateColorDistance(
     getRGB(currentColor),
@@ -62,6 +81,13 @@ function* shipColor() {
 
   // put clear color
   yield put(clearColor());
+  yield put(
+    updateTargetColor({
+      red: Math.floor(Math.random() * 10),
+      green: Math.floor(Math.random() * 10),
+      blue: Math.floor(Math.random() * 10)
+    })
+  );
 
   // put add to score
   yield put(updateScore(currentScore + shipValue));
@@ -126,7 +152,7 @@ function* buyBlue() {
 // to the sagas which need it.
 // const api = DebugConfig.useFixtures ? FixtureAPI : API.create()
 
-function* incrementScore(timeDelta) {
+function* tickScore(timeDelta) {
   const currentScore = yield select(getScore);
   const interestRate = yield select(getInterestRate);
   const newScore = currentScore + (1 + currentScore * interestRate) * timeDelta;
@@ -146,7 +172,7 @@ function* tickSaga() {
     let diff = thisCall - lastCall;
 
     score = yield select(({ game }) => game.score);
-    yield incrementScore(diff / 1000);
+    yield tickScore(diff / 1000);
 
     lastCall = thisCall;
   }
@@ -157,9 +183,11 @@ function* tickSaga() {
 export default function* root() {
   yield all([
     fork(tickSaga),
+    takeEvery(GameTypes.INCREMENT_SCORE, incrementScore),
     takeEvery(GameTypes.BUY_RED, buyRed),
     takeEvery(GameTypes.BUY_GREEN, buyGreen),
     takeEvery(GameTypes.BUY_BLUE, buyBlue),
-    takeEvery(GameTypes.SHIP_COLOR, shipColor)
+    takeEvery(GameTypes.SHIP_COLOR, shipColor),
+    takeEvery(GameTypes.BUY_INVESTMENT, buyInvestment)
   ]);
 }
