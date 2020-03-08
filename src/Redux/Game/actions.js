@@ -7,7 +7,10 @@ export const { Types, Creators } = createActions(
     updateColors: ["newColors"],
     buyRed: null,
     buyBlue: null,
-    buyGreen: null
+    buyGreen: null,
+    shipColor: null,
+    clearColor: null,
+    addShippedColor: ["shippedColor"]
   },
   {}
 );

@@ -5,7 +5,9 @@ import CurrentColorCard from "./CurrentColorCard";
 import TargetColorCard from "./TargetColorCard";
 import GenerateScore from "../Components/GenerateScore";
 import PurchasePalette from "../Components/PurchasePalette";
+import ShipColor from "../Components/ShipColor";
 import "./Main.css";
+
 const MainView = ({ incrementScore }) => {
   return (
     <div className="playArea">
@@ -15,12 +17,7 @@ const MainView = ({ incrementScore }) => {
           Invest
         </button>
         <PurchasePalette />
-        <button id="shipIt" name="shipIt">
-          Ship It!
-        </button>
-        <button id="dumpIt" name="dumpIt">
-          Dump It!
-        </button>
+        <ShipColor />
       </div>
       <CurrentColorCard />
       <TargetColorCard />

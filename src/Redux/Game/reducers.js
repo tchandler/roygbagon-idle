@@ -9,3 +9,11 @@ export const updateScore = (state, action) => {
 export const updateColors = (state, action) => {
   return { ...state, colors: action.newColors };
 };
+
+export const clearColor = state => {
+  return { ...state, colors: { red: 0, green: 0, blue: 0 } };
+};
+
+export const addShippedColor = (state, { shippedColor }) => {
+  return { ...state, shipped: [shippedColor, ...state.shipped] };
+};
