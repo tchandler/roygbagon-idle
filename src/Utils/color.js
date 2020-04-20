@@ -1,4 +1,8 @@
-export const getRGB = color => [color >> 16, (color >> 8) & 0xff, color & 0xff];
+export const getRGB = (color) => [
+  color >> 16,
+  (color >> 8) & 0xff,
+  color & 0xff,
+];
 
 export const calculateColorHex = (red, green, blue) => {
   const total = red + green + blue;
@@ -14,3 +18,6 @@ export const calculateColorDistance = ([x1, y1, z1], [x2, y2, z2]) =>
 
 export const calculateColorWeight = ({ red, green, blue }) =>
   red + green + blue;
+
+export const colorToRGB = ({ red, green, blue }) =>
+  getRGB(parseInt(calculateColorHex(red, green, blue), 16));

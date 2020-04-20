@@ -1,13 +1,13 @@
 import { takeEvery, all, put, select, fork } from "redux-saga/effects";
 import {
   Creators as GameActions,
-  Types as GameTypes
+  Types as GameTypes,
 } from "../Redux/Game/actions";
 import {
   calculateColorHex,
   calculateColorDistance,
-  getRGB,
-  calculateColorWeight
+  colorToRGB,
+  calculateColorWeight,
 } from "../Utils/color";
 const {
   updateScore,
@@ -15,7 +15,7 @@ const {
   clearColor,
   addShippedColor,
   updateInvestment,
-  updateTargetColor
+  updateTargetColor,
 } = GameActions;
 // import DebugConfig from '../Config/DebugConfig'
 
@@ -32,7 +32,7 @@ const getConfig = ({ config }) => config;
 const getGameState = ({ game }) => game;
 const getColors = ({ game }) => ({
   currentColor: game.colors,
-  targetColor: game.targetColor
+  targetColor: game.targetColor,
 });
 
 function* incrementScore() {
@@ -56,8 +56,8 @@ function* shipColor() {
   const currentScore = yield select(getScore);
 
   const colorDistance = calculateColorDistance(
-    getRGB(currentColor),
-    getRGB(targetColor)
+    colorToRGB(currentColor),
+    colorToRGB(targetColor)
   );
 
   const colorErrorPct = colorDistance / 195075;
@@ -77,7 +77,9 @@ function* shipColor() {
     shipAwardMultiplyer *
     accuracyMod;
 
-  const shipValue = Math.max(baseAward - colorErrorPct * baseAward, 0);
+  const shipValue = Math.round(
+    Math.max(baseAward - colorErrorPct * baseAward, 0)
+  );
 
   // put clear color
   yield put(clearColor());
@@ -85,7 +87,7 @@ function* shipColor() {
     updateTargetColor({
       red: Math.floor(Math.random() * 10),
       green: Math.floor(Math.random() * 10),
-      blue: Math.floor(Math.random() * 10)
+      blue: Math.floor(Math.random() * 10),
     })
   );
 
@@ -98,7 +100,7 @@ function* shipColor() {
     targetColor,
     shipValue,
     error: colorErrorPct,
-    weightDiff: weightError
+    weightDiff: weightError,
   };
 
   yield put(addShippedColor(shippedColor));
@@ -125,7 +127,7 @@ function* buyGreen() {
     yield put(
       updateColors({
         ...currentColors,
-        green: currentColors.green + 1
+        green: currentColors.green + 1,
       })
     );
   }
@@ -141,7 +143,7 @@ function* buyBlue() {
     yield put(
       updateColors({
         ...currentColors,
-        blue: currentColors.blue + 1
+        blue: currentColors.blue + 1,
       })
     );
   }
@@ -160,7 +162,7 @@ function* tickScore(timeDelta) {
 }
 
 const nextFrame = () =>
-  new Promise(resolve => window.requestAnimationFrame(() => resolve()));
+  new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
 
 function* tickSaga() {
   let lastCall = Date.now();
@@ -188,6 +190,6 @@ export default function* root() {
     takeEvery(GameTypes.BUY_GREEN, buyGreen),
     takeEvery(GameTypes.BUY_BLUE, buyBlue),
     takeEvery(GameTypes.SHIP_COLOR, shipColor),
-    takeEvery(GameTypes.BUY_INVESTMENT, buyInvestment)
+    takeEvery(GameTypes.BUY_INVESTMENT, buyInvestment),
   ]);
 }
