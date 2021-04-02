@@ -14,6 +14,7 @@ const ShippedColorLog = ({ shipped }) =>
           red={shippedColor.shippedColor.red}
           green={shippedColor.shippedColor.green}
           blue={shippedColor.shippedColor.blue}
+          detail
         />
       </div>
       <div>
@@ -22,6 +23,7 @@ const ShippedColorLog = ({ shipped }) =>
           red={shippedColor.targetColor.red}
           green={shippedColor.targetColor.green}
           blue={shippedColor.targetColor.blue}
+          detail
         />
       </div>
       <div>

@@ -13,12 +13,6 @@ import "./Main.css";
 const MainView = () => {
   return (
     <div className="playArea">
-      <div className="buttons">
-        <GenerateScore />
-        <Invest />
-        <PurchasePalette />
-        <ShipColor />
-      </div>
       <CurrentColorCard />
       <TargetColorCard />
       <ShippedColorLog />

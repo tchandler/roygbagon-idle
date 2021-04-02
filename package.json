@@ -15,7 +15,7 @@
     "reduxsauce": "^1.1.2"
   },
   "scripts": {
-    "dev": "parcel index.html",
+    "dev": "env NODE_ENV=development parcel index.html",
     "build": "parcel build index.html --public-url ./"
   },
   "devDependencies": {

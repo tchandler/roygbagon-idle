@@ -1,14 +1,14 @@
 import React from "react";
-import Ticker from "./Ticker";
 import { connect } from "react-redux";
 import MainView from "r/Containers/Main";
+import Inventory from "./Inventory";
 
 class App extends React.Component {
   render() {
     return (
       <div>
         <div className="container">
-          <Ticker />
+          <Inventory />
           <MainView />
         </div>
       </div>

@@ -14,8 +14,8 @@ const DEFAULT_CONFIG = {
     [0.25, 0.8],
     [0.1, 1],
     [0.05, 1.5],
-    [0.01, 1.75]
-  ]
+    [0.01, 1.75],
+  ],
 };
 
 export const reducer = createReducer(DEFAULT_CONFIG, {});

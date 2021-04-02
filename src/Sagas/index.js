@@ -11,6 +11,7 @@ import {
 } from "../Utils/color";
 const {
   updateScore,
+  updateStock,
   updateColors,
   clearColor,
   addShippedColor,
@@ -24,6 +25,7 @@ const {
 // import { checkAuth, login, reminder } from './LoginSagas';
 
 const getScore = ({ game }) => game.score;
+const getStock = ({ game }) => game.stock;
 const getInvestment = ({ game }) => game.investment;
 const getInterestRate = ({ game, config }) =>
   game.investment * config.investmentIncrement;
@@ -111,9 +113,9 @@ function* buyRed() {
   const { colorCost } = yield select(getConfig);
 
   if (currentScore >= colorCost) {
-    const currentColors = yield select(({ game }) => game.colors);
+    const currentStock = yield select(({ game }) => game.stock);
     yield put(updateScore(currentScore - colorCost));
-    yield put(updateColors({ ...currentColors, red: currentColors.red + 1 }));
+    yield put(updateStock({ ...currentStock, red: currentStock.red + 1 }));
   }
 }
 
@@ -122,12 +124,12 @@ function* buyGreen() {
   const { colorCost } = yield select(getConfig);
 
   if (currentScore >= colorCost) {
-    const currentColors = yield select(({ game }) => game.colors);
+    const currentStock = yield select(({ game }) => game.stock);
     yield put(updateScore(currentScore - colorCost));
     yield put(
-      updateColors({
-        ...currentColors,
-        green: currentColors.green + 1,
+      updateStock({
+        ...currentStock,
+        green: currentStock.green + 1,
       })
     );
   }
@@ -138,15 +140,32 @@ function* buyBlue() {
   const { colorCost } = yield select(getConfig);
 
   if (currentScore >= colorCost) {
-    const currentColors = yield select(({ game }) => game.colors);
+    const currentStock = yield select(({ game }) => game.stock);
     yield put(updateScore(currentScore - colorCost));
     yield put(
-      updateColors({
-        ...currentColors,
-        blue: currentColors.blue + 1,
+      updateStock({
+        ...currentStock,
+        blue: currentStock.blue + 1,
       })
     );
   }
+}
+
+function* addColorToBatch({ color, batchId }) {
+  const { currentColor: batch } = yield select(getColors); // reference batches instead of global color
+  const stock = yield select(getStock);
+  yield put(
+    updateStock({
+      ...stock,
+      [color]: stock[color] - 1,
+    })
+  );
+  yield put(
+    updateColors({
+      ...batch,
+      [color]: batch[color] + 1,
+    })
+  );
 }
 /* ------------- API ------------- */
 
@@ -161,23 +180,40 @@ function* tickScore(timeDelta) {
   yield put(updateScore(newScore));
 }
 
+function* tickStock(timeDelta) {
+  const currentStock = yield select(getStock);
+  const fillRate = yield select(({ game }) => game.stockFillRate);
+  const fillAmount = fillRate * timeDelta;
+  const newStock = {
+    red: currentStock.red + fillAmount,
+    green: currentStock.green + fillAmount,
+    blue: currentStock.blue + fillAmount,
+  };
+  yield put(updateStock(newStock));
+}
+
 const nextFrame = () =>
   new Promise((resolve) => window.requestAnimationFrame(() => resolve()));
 
 function* tickSaga() {
   let lastCall = Date.now();
   let thisCall = Date.now();
-  let score = yield select(({ game }) => game.score);
+  let score = yield select(getScore);
+  // TODO: Win conditional?
   while (score < 100000) {
     yield nextFrame();
     thisCall = Date.now();
-    let diff = thisCall - lastCall;
+    let diffMs = thisCall - lastCall;
+    let diffS = diffMs / 1000;
 
-    score = yield select(({ game }) => game.score);
-    yield tickScore(diff / 1000);
+    score = yield select(getScore);
+    yield tickScore(diffS);
+    yield tickStock(diffS);
 
     lastCall = thisCall;
   }
+  // TODO: Win update
+  yield put(updateScore(1000));
 }
 
 /* ------------- Connect Types To Sagas ------------- */
@@ -189,6 +225,7 @@ export default function* root() {
     takeEvery(GameTypes.BUY_RED, buyRed),
     takeEvery(GameTypes.BUY_GREEN, buyGreen),
     takeEvery(GameTypes.BUY_BLUE, buyBlue),
+    takeEvery(GameTypes.ADD_COLOR_TO_BATCH, addColorToBatch),
     takeEvery(GameTypes.SHIP_COLOR, shipColor),
     takeEvery(GameTypes.BUY_INVESTMENT, buyInvestment),
   ]);

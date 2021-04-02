@@ -10,7 +10,7 @@ const renderDetails = (red, green, blue, detail) => {
       <li>Red: {red}</li>
       <li>Green: {green}</li>
       <li>Blue: {blue}</li>
-      <li></li>
+      <li>Weight: {red + green + blue}</li>
     </ul>
   ) : (
     <ul className="details">
